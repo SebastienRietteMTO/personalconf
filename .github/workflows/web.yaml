@@ -3,7 +3,7 @@ run-name: Updating online doc
 on:
   push:
     branches:
-      - main
+      - master
 jobs:
   deploy:
     runs-on: ubuntu-latest
