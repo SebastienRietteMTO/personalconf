@@ -81,6 +81,21 @@ cat - <<EOF > $WEB/index.html
 EOF
 
 #######################
+### Crontab entries
+#######################
+freq='--daily'
+comment='# update personalconf'
+if [ $doc_only == false ]; then
+  for line in "@reboot $ROOT/update.sh $freq" \
+              "@hourly $ROOT/update.sh $freq"; do
+    if ! grep "^${line}" <(crontab -l) > /dev/null; then
+      log "Adding '$line' to crontab"
+      ( crontab -l; echo "$line $comment" ) | crontab -
+    fi
+  done
+fi
+
+#######################
 ### vim
 #######################
 log "VIM"
