@@ -1,0 +1,127 @@
+<p>After installation, this doc can be displayed with
+<code>git Myhelp</code></p>
+<h1 id="clone-fetch-checkout">CLONE / FETCH / CHECKOUT</h1>
+<ul>
+<li><code>git clone &lt;filename&gt;.git &lt;directory&gt;</code> #
+filename can be an url (git@XXX.git, https://XXX.git) or a file (local
+or distant host:XXX.git)</li>
+<li><code>git fetch &lt;remote&gt;</code> # to get branches from a
+remote without merging</li>
+<li><code>git pull &lt;remote&gt;</code> # to get and merge from a
+remote</li>
+<li><code>git checkout &lt;branch&gt;</code></li>
+<li><code>git checkout &lt;branch&gt; &lt;file&gt;</code> # checkout a
+file</li>
+<li><code>git remote -v</code> # list the configured remotes</li>
+<li><code>git rename &lt;remote_old&gt; &lt;remote_new&gt;</code></li>
+<li><code>git remote add &lt;remote&gt; &lt;url&gt;</code></li>
+</ul>
+<h1 id="log-status">LOG / STATUS</h1>
+<ul>
+<li><code>git status</code></li>
+<li><code>git log</code></li>
+<li><code>git log1</code> # equivalent to <code>git log -n1</code></li>
+<li><code>git log --graph --oneline –all</code></li>
+<li><code>gitk</code> (graphical interface)</li>
+<li><code>git show &lt;HASH&gt;</code> with <code>-s</code> to get
+commit message, <code>--name-only</code> to list modified files,
+<code>--name-status</code> to list modified files with their status</li>
+<li><code>git show &lt;branch&gt;:&lt;file&gt;</code> # use
+<code>s</code> instead of show to open it in vi</li>
+<li><code>git diff &lt;branch1&gt;:&lt;file1&gt; &lt;branch2&gt;:&lt;file2&gt;</code>
+# use <code>d</code> to show diff in vi</li>
+</ul>
+<h1 id="branches">BRANCHES</h1>
+<ul>
+<li><code>git branch</code> # list branches (with <code>-r</code> for
+remote)</li>
+<li><code>git checkout</code> <branch> # to go on a branch</li>
+<li><code>git checkout -b &lt;new branch name&gt; &lt;branch&gt;</code>
+# create a new branch starting from other branch</li>
+<li><code>git branch -d &lt;branch&gt;</code> # to remove local
+branch</li>
+<li><code>git push &lt;remote&gt; -d &lt;branch&gt;</code> # to remove
+remote branch (never use it)</li>
+<li><code>git branch &lt;branch&gt;; git reset --keep HEAD~2</code> #
+move the two last commits on a new branch</li>
+</ul>
+<h1 id="commit-push">COMMIT / PUSH</h1>
+<ul>
+<li><code>git add &lt;file or directory&gt;</code></li>
+<li><code>git commit</code></li>
+<li><code>git commit --amend</code> # to modify last commit</li>
+<li><code>git reset &lt;HASH&gt; --hard</code> # reset local branch to
+this commit (remove commits)</li>
+<li><code>git push &lt;remote&gt; +&lt;HASH&gt;:&lt;branch&gt;</code> #
+reset remote branch to this commit (remove commits, never use it)</li>
+<li><code>git pull; git push</code> # push a commit/branch (the pull is
+done to check if local repository is up to date)</li>
+</ul>
+<h1 id="tags">TAGS</h1>
+<p>A good practice would be to push only “annotated tags” (created with
+the <code>-a</code> option) and keep “lightweight tags” for local
+development.</p>
+<ul>
+<li><code>git tag -a &lt;TAG&gt;</code> # add a tag to the current
+commit</li>
+<li><code>git tag -a &lt;TAG&gt; &lt;HASH&gt;</code> # add a tag to a
+given commit</li>
+<li><code>git push &lt;TAG&gt;</code> # to push a tag</li>
+<li><code>git fetch --tags</code> # to get tags</li>
+<li><code>git lasttag</code> # to find the last tag</li>
+<li><code>git tag -d &lt;TAG&gt;</code> # suppress a local tag</li>
+<li><code>git push --delete &lt;remote&gt;upstream &lt;TAG&gt;</code> #
+suppress a remote tag</li>
+</ul>
+<h1 id="merge">MERGE</h1>
+<ul>
+<li><code>git merge --no-commit --no-ff &lt;branch&gt;; git merge --abort</code>
+dry run</li>
+<li><code>git merge &lt;branch&gt;</code> # merge a branch in the
+current one</li>
+<li>in case of a conflict:
+<ul>
+<li><code>git merge --abort</code> # to abort</li>
+<li><code>git status</code> # to get the list of files where there is a
+conflict</li>
+<li>edition of files, conflicts are identified by
+‘&lt;&lt;&lt;&lt;&lt;’, ‘&gt;&gt;&gt;&gt;&gt;’ and ‘=====’ strings</li>
+<li><code>git mergetool</code> to use vi (in the order: version before
+merge, last common version, version to merge, result)</li>
+</ul></li>
+<li><code>git cherry-pick &lt;HASH&gt;</code> # merge a single
+commit</li>
+</ul>
+<h1 id="rebase">REBASE</h1>
+<ul>
+<li><code>git checkout &lt;branch&gt;; git rebase main</code> # to
+rebase branch on main</li>
+<li><code>git checkout &lt;branch_dev&gt;; git rebase --onto &lt;branch_A&gt; &lt;branch_B&gt;</code>
+# if branch_dev is based on branch_B, put commits between B and dev onto
+A (eg. backphasing)</li>
+</ul>
+<h1 id="stashes">STASHES</h1>
+<p>Staches is a way to save uncommited changes to be able to perform
+other action (eg. merge)</p>
+<ul>
+<li><code>git stash save "message"</code> # to create a stash, add the
+<code>-u</code> option to include non tracked files</li>
+<li><code>git stash list</code> # to get a list of the stashes</li>
+<li><code>git stash show stash@{n}</code> # <code>n</code> being the
+stash number, to inspect a stach. With <code>-p</code> to see a
+diff</li>
+<li><code>git stash pop stash@{n}</code> # apply the stash number
+<code>n</code></li>
+<li><code>git stash branch &lt;branch&gt; stash@{n}</code> # to put the
+stash number <code>n</code> in a branch</li>
+<li><code>git stash drop stash@{n}</code> # to delete the stash number
+<code>n</code></li>
+</ul>
+<h1 id="github-pull-request">GITHUB PULL REQUEST</h1>
+<p>The pull request ID can be found using the web interface</p>
+<ul>
+<li><code>git fetch &lt;remote&gt; pull/&lt;ID&gt;/head:&lt;branch&gt;</code>
+# create a local branch with the pull request content</li>
+<li><code>git pull &lt;remote&gt; pull/&lt;ID&gt;/head</code> # merge
+the pull request in the current branch</li>
+</ul>

@@ -1,0 +1,109 @@
+# HELP on this file
+# Documentation must begin with the string ' DOC' to be extracted automatically issuing
+# grep '^# DOC' .gitconfig | cut -c 7- | sed 's/\[/`/g' | sed 's/\]/`/g' | pandoc -f markdown -o customhelp.pdf
+# In addition the command git Myhelp will display it
+# The documentation is used as a cheat sheet general to git and specific to this configuration
+#
+# use [] to enclosed commands
+#
+# DOC After installation, this doc can be displayed with `git Myhelp`
+# DOC
+# DOC CLONE / FETCH / CHECKOUT
+# DOC ========================
+# DOC - [git clone <filename>.git <directory>] # filename can be an url (git@XXX.git, https://XXX.git) or a file (local or distant host:XXX.git)
+# DOC - [git fetch <remote>] # to get branches from a remote without merging
+# DOC - [git pull <remote>] # to get and merge from a remote
+# DOC - [git checkout <branch>]
+# DOC - [git checkout <branch> <file>] # checkout a file
+# DOC - [git remote -v] # list the configured remotes
+# DOC - [git rename <remote_old> <remote_new>]
+# DOC - [git remote add <remote> <url>]
+# DOC
+# DOC LOG / STATUS
+# DOC ============
+# DOC - [git status]
+# DOC - [git log]
+# DOC - [git log1] # equivalent to [git log -n1]
+# DOC - [git log --graph --oneline –all]
+# DOC - [gitk] (graphical interface)
+# DOC - [git show <HASH>] with [-s] to get commit message, [--name-only] to list modified files, [--name-status] to list modified files with their status
+# DOC - [git show <branch>:<file>] # use [s] instead of show to open it in vi
+# DOC - [git diff <branch1>:<file1> <branch2>:<file2>] # use [d] to show diff in vi
+# DOC
+# DOC BRANCHES
+# DOC ========
+# DOC - [git branch] # list branches (with [-r] for remote)
+# DOC - [git checkout] <branch> # to go on a branch
+# DOC - [git checkout -b <new branch name> <branch>] # create a new branch starting from other branch
+# DOC - [git branch -d <branch>] # to remove local branch
+# DOC - [git push <remote> -d <branch>] # to remove remote branch (never use it)
+# DOC - [git branch <branch>; git reset --keep HEAD~2] # move the two last commits on a new branch
+# DOC
+# DOC COMMIT / PUSH
+# DOC =============
+# DOC - [git add <file or directory>]
+# DOC - [git commit]
+# DOC - [git commit --amend] # to modify last commit
+# DOC - [git reset <HASH> --hard] # reset local branch to this commit (remove commits)
+# DOC - [git push <remote> +<HASH>:<branch>] # reset remote branch to this commit (remove commits, never use it)
+# DOC - [git pull; git push] # push a commit/branch (the pull is done to check if local repository is up to date)
+# DOC
+# DOC TAGS
+# DOC ====
+# DOC A good practice would be to push only “annotated tags” (created with the [-a] option)
+# DOC and keep “lightweight tags” for local development.
+# DOC
+# DOC - [git tag -a <TAG>] # add a tag to the current commit
+# DOC - [git tag -a <TAG> <HASH>] # add a tag to a given commit
+# DOC - [git push <TAG>] # to push a tag
+# DOC - [git fetch --tags] # to get tags
+# DOC - [git lasttag] # to find the last tag
+# DOC - [git tag -d <TAG>] # suppress a local tag
+# DOC - [git push --delete <remote>upstream <TAG>] # suppress a remote tag
+# DOC
+# DOC MERGE
+# DOC =====
+# DOC - [git merge --no-commit --no-ff <branch>; git merge --abort] dry run
+# DOC - [git merge <branch>] # merge a branch in the current one
+# DOC - in case of a conflict:
+# DOC   - [git merge --abort] # to abort
+# DOC   - [git status] # to get the list of files where there is a conflict
+# DOC   - edition of files, conflicts are identified by ‘<<<<<’, ‘>>>>>’ and ‘=====’ strings
+# DOC   - [git mergetool] to use vi (in the order: version before merge, last common version, version to merge, result)
+# DOC - [git cherry-pick <HASH>] # merge a single commit
+# DOC
+# DOC REBASE
+# DOC ======
+# DOC - [git checkout <branch>; git rebase main] # to rebase branch on main
+# DOC - [git checkout <branch_dev>; git rebase --onto <branch_A> <branch_B>] # if branch_dev is based on branch_B, put commits between B and dev onto A (eg. backphasing)
+# DOC
+# DOC STASHES
+# DOC =======
+# DOC Staches is a way to save uncommited changes to be able to perform other action (eg. merge)
+# DOC
+# DOC - [git stash save "message"] # to create a stash, add the [-u] option to include non tracked files
+# DOC - [git stash list] # to get a list of the stashes
+# DOC - [git stash show stash@{n}] # [n] being the stash number, to inspect a stach. With [-p] to see a diff
+# DOC - [git stash pop stash@{n}] # apply the stash number [n]
+# DOC - [git stash branch <branch> stash@{n}] # to put the stash number [n] in a branch
+# DOC - [git stash drop stash@{n}] # to delete the stash number [n]
+# DOC
+# DOC GITHUB PULL REQUEST
+# DOC ===================
+# DOC The pull request ID can be found using the web interface
+# DOC
+# DOC - [git fetch <remote> pull/<ID>/head:<branch>] # create a local branch with the pull request content
+# DOC - [git pull <remote> pull/<ID>/head] # merge the pull request in the current branch
+
+[diff]
+	tool = vimdiff
+[difftool]
+	prompt = false
+[alias]
+	d = difftool
+	s = "!f() { TMP_LOC=$(mktemp -d --tmpdir=/tmp XXXXXX); basename=$(basename \"$1\"); git show \"$1\" > $TMP_LOC/$basename; chmod -w $TMP_LOC/$basename; vi $TMP_LOC/$basename; rm -rf $TMP_LOC; }; f" # show file in vi
+	log1 = log -n1
+	Myhelp = "!echo -e \"$(grep '^# DOC' $(git config --list --show-origin | grep alias.Myhelp | cut -d: -f2 | cut -f1) | cut -c 7- | sed 's/\\[/`\\\\033[2m/g' | sed 's/\\]/\\\\033[0m`/g')\" | more" # display the included doc
+	lasttag = "!git describe --tags `git rev-list --tags --max-count=1`" # get the last tag set on the current branch
+[merge]
+	tool = vimdiff
