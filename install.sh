@@ -86,6 +86,10 @@ EOF
 freq='--daily'
 comment='# update personalconf'
 if [ $doc_only == false ]; then
+  # We want to update the configuration once a day but we cannot
+  # guarantee that the system will be up at midnight. So we try
+  # to run the script hourly and at reboot time. And, in addition,
+  # the update script performs a check to limit hourly execution.
   for line in "@reboot $ROOT/update.sh $freq" \
               "@hourly $ROOT/update.sh $freq"; do
     if ! grep "^${line}" <(crontab -l) > /dev/null; then
