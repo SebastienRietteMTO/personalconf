@@ -131,6 +131,26 @@ if [ $doc_only == false ]; then
 fi
 
 #######################
+### git
+#######################
+log "GIT"
+
+repository_git=https://gist.github.com/SebastienRietteMTO/ab736e0b99179e4eb48cd757d153788e
+GITFILE=$(clone_or_pull $repository_git git)/.gitconfig
+
+# Doc generation
+grep '^# DOC' $GITFILE | cut -c 7- | sed 's/\[/`/g' | sed 's/\]/`/g' | pandoc -f markdown -o $WEB/git.html
+cp $GITFILE $WEB/gitconfig
+echo "      <li>GIT: <a href='git.html'>doc</a> and associated <a href='gitconfig'>conf</a></li>" >> $WEB/index.html
+
+# Installation
+if [ $doc_only == false ]; then
+  if ! git config --global --get-all include.path | grep -Fx $GITFILE > /dev/null 2>&1; then
+    git config --global --add include.path $GITFILE
+  fi
+fi
+
+#######################
 ### END
 #######################
 cat - <<EOF >> $WEB/index.html
