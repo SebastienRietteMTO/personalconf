@@ -6,7 +6,8 @@ manager (vim-plug) is updated. Commands are:</p>
 <li>:PlugClean to remove unused plugins</li>
 </ul>
 <h1 id="nerdtree">NERDTree</h1>
-<p>&lt;Ctrl-t&gt; or :NERDTree to open a window with directory tree</p>
+<p>&lt;Ctrl-t&gt; or :NERDTree to open a window with directory tree
+&lt;Ctrl-u&gt; to toggle NERDTree on all already opened tabs</p>
 <ul>
 <li>Open a tab with t</li>
 <li>fold/unfold with Space or the mouse</li>
@@ -32,9 +33,15 @@ href="https://github.com/hanschen/vim-ipython-cell?tab=readme-ov-file#commands">
 <li>help with &lt;Ctrl-Space&gt;</li>
 </ul>
 <h1 id="tags">Tags</h1>
-<p>Open a tag navigator with &lt;Ctrl-y&gt;</p>
+<p>Open a tag navigator with &lt;Ctrl-u&gt;</p>
 <h1 id="search">Search</h1>
 <p>:FZF to search for a file by filename</p>
+<h1 id="ai">AI</h1>
+<p>:AI {prompt} to complete using the promp (can use the selection)
+:AIEdit {prompt} (or :E) to edit the selection :AIChat (ou Ctrl-h) to
+open a chat window, retype :AIChat each time you want an answer several
+models are available and are selected with /{model} The albert API key
+must be stored in ~/.albert.token</p>
 <h1 id="diff-mode">Diff mode</h1>
 <ul>
 <li>&lt;Ctrl-↑&gt;, &lt;Ctrl-↓&gt; to go to previous/next diff</li>
@@ -63,4 +70,5 @@ p</li>
 <li>get the list of undo by :undolist</li>
 </ul></li>
 <li>:cq to exit with error (to abort a git commit)</li>
+<li>Help message by :Myhelp</li>
 </ul>

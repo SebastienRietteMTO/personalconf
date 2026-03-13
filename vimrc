@@ -4,12 +4,15 @@
 "   (by :IPython)
 " - It would be nice to install ripgrep or Silver Searcher to use :Rp or :Ag to
 "   search file content
+" - It seems that two mecanism activates syntax highligting (scheme colors
+"   change at startup on fortran files: they appear in a color then switch to
+"   another). I must find them and remove one.
 
 " HELP on this file
 " Documentation on commands (new mapping or other) must begin with
 " the string ' DOC' to be extracted automatically issuing
 " grep '^" DOC' .vimrc | cut -c 7- | pandoc -f markdown -o customhelp.pdf
-" In addition the command :myhelp will display it
+" In addition the command :Myhelp will display it
 :command Myhelp :echo(system('grep "^\" DOC" ~/.vimrc | sed "s/\\\</</" | sed "s/\\\>/>/" | cut -c 7-'))
 
 " INSTALLATION
@@ -40,13 +43,19 @@ if empty(glob('~/.vim/autoload/plug.vim'))
     \ https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
 endif
 
-" Upgrade it
-autocmd VimEnter * PlugUpgrade
-
-" Run PlugInstall if there are missing plugins
-autocmd VimEnter * if len(filter(values(g:plugs), '!isdirectory(v:val.dir)'))
-  \| PlugInstall --sync | source $MYVIMRC
-\| endif
+" Upgrade / update at most once per day
+let output = system("[ ! -f ~/.vimrc_last_update ] && touch --date='2 days ago' ~/.vimrc_last_update")
+let output = system("test $(($(date +%s) - $(date -r ~/.vimrc_last_update +%s))) -ge 86400")
+if v:shell_error == 0
+  silent !touch ~/.vimrc_last_update
+  " Upgrade it
+  autocmd VimEnter * PlugUpgrade
+  
+  " Run PlugInstall if there are missing plugins
+  autocmd VimEnter * if len(filter(values(g:plugs), '!isdirectory(v:val.dir)'))
+    \| PlugInstall --sync | source $MYVIMRC
+  \| endif
+endif
 
 call plug#begin()
 Plug 'junegunn/vim-plug' " to get plugin manager help
@@ -74,6 +83,7 @@ hi ALEVirtualTextStyleWarning ctermbg=190 ctermfg=16 cterm=bold
 " DOC NERDTree
 " DOC ========
 " DOC \<Ctrl-t\> or :NERDTree to open a window with directory tree
+" DOC \<Ctrl-u\> to toggle NERDTree on all already opened tabs
 " DOC
 " DOC - Open a tab with t
 " DOC - fold/unfold with Space or the mouse
@@ -90,6 +100,25 @@ nnoremap <C-t> :NERDTreeToggle<CR> " Open/close it with Ctrl-t
 let NERDTreeMapActivateNode='<space>'
 let NERDTreeIgnore=['\.pyc$', '\~$', '^__pycache__$'] "ignore files in NERDTree
 let NERDTreeShowHidden=1
+
+" The following functions deal with toggling NERDTree when several tabs
+" are opened with 'vi -p'
+function! NERDTreeTabToggle(state)
+  " Toggle several times until getting the right
+  " number of nerdtree buffer
+  NERDTreeToggle
+  NERDTreeToggle
+  if exists('b:NERDTree') != a:state
+    NERDTreeToggle
+  endif
+endfunc
+function! MyNERDTreeToggle()
+  let l:current_tab = tabpagenr()
+  let l:must_exist = !exists('b:NERDTree')
+  tabdo call NERDTreeTabToggle(l:must_exist)
+  exe 'tabn ' . l:current_tab
+endfunction
+nnoremap <C-y> :call MyNERDTreeToggle()<CR>
 Plug 'xuyuanp/nerdtree-git-plugin' " Add git status, see also GIT plugin section
 
 """"" Status bar
@@ -153,10 +182,10 @@ Plug 'davidhalter/jedi-vim' " Ctrl-space to get help on python functions
 " DOC
 " DOC Tags
 " DOC ====
-" DOC Open a tag navigator with \<Ctrl-y\>
+" DOC Open a tag navigator with \<Ctrl-u\>
 " DOC
 Plug 'majutsushi/tagbar' " :TagbarToggle
-nnoremap <C-y> :TagbarToggle<CR>
+nnoremap <C-u> :TagbarToggle<CR>
 
 " EXEC [ ! -d $HOME/GIT ] && mkdir $HOME/GIT
 " EXEC cd $HOME/GIT
@@ -184,7 +213,7 @@ nnoremap <C-y> :TagbarToggle<CR>
 let g:tagbar_ctags_bin = "$HOME/GIT/ctags/ctags"
 
 """"" Languages
-Plug 'sheerun/vim-polyglot'
+"Plug 'sheerun/vim-polyglot'
 
 """"" Search
 " DOC
@@ -192,9 +221,53 @@ Plug 'sheerun/vim-polyglot'
 " DOC ======
 " DOC :FZF to search for a file by filename
 " DOC
-Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }
+Plug 'junegunn/fzf' "suppressed for vim<8 compatibility:, { 'do': { -> fzf#install() } }
 Plug 'junegunn/fzf.vim'
-"
+
+""""" Copy/paste over ssh
+"Keep here for latter when gnome-mate-xfce terminals will support OSC-52
+"Plug 'fcpg/vim-osc52'
+"vmap <C-c> y:Oscyank<cr>
+"xmap <F7> y:Oscyank<cr>
+
+""""" AI
+" DOC
+" DOC AI
+" DOC ==
+" DOC :AI {prompt} to complete using the promp (can use the selection)
+" DOC :AIEdit {prompt} (or :E) to edit the selection
+" DOC :AIChat (ou Ctrl-h) to open a chat window, retype :AIChat each time you want an answer
+" DOC several models are available and are selected with /{model}
+" DOC The albert API key must be stored in ~/.albert.token
+Plug 'madox2/vim-ai'
+let g:vim_ai_roles_config_file = '~/.vimairoles.ini'
+" EXEC cat - <<EOF > ~/.vimairoles.ini
+" EXEC [default]
+" EXEC options.endpoint_url = https://albert.api.etalab.gouv.fr/v1/chat/completions
+" EXEC options.token_file_path = ~/.albert.token
+" EXEC provider = openai
+" EXEC options.model = mistralai/Mistral-Small-3.2-24B-Instruct-2506
+" EXEC 
+" EXEC [mistralsmall]
+" EXEC options.model = mistralai/Mistral-Small-3.2-24B-Instruct-2506
+" EXEC 
+" EXEC [mistral]
+" EXEC options.model = mistralai/Ministral-3-8B-Instruct-2512
+" EXEC 
+" EXEC [whisper]
+" EXEC options.model = openai/whisper-large-v3
+" EXEC 
+" EXEC [gpt]
+" EXEC options.model = openai/gpt-oss-120b
+" EXEC 
+" EXEC [qwen]
+" EXEC options.model = Qwen/Qwen3-Coder-30B-A3B-Instruct
+" EXEC EOF
+
+nnoremap <C-h> :AIChat<CR>
+xnoremap <C-h> :AIChat<CR>
+cabbrev E AIEdit
+
 call plug#end()
 
 
@@ -288,8 +361,8 @@ nnoremap <space> za " Enable folding with spacebar
 " DOC - \<Ctrl-b\> to open a terminal in the current window
 " DOC - \<Ctrl-n\> to open a new tab with a terminal
 " DOC - \<Ctrl-w\>N to be able to scroll and/or copy, i to return
-noremap <C-b> :terminal ++curwin<CR>
-noremap <C-n> :tab terminal<CR>
+noremap <C-b> :terminal ++curwin ++close bash -l<CR>
+noremap <C-n> :tab terminal ++close bash -l<CR>
 
 " To merge vim clipboard and system clipboard?
 " Doesn't work with gnome terminal
@@ -303,4 +376,5 @@ set clipboard^=unnamed,unnamedplus
 " DOC   - undo with u, undo the line with U, redo with \<Ctrl-r\>
 " DOC   - get the list of undo by :undolist
 " DOC - :cq to exit with error (to abort a git commit)
+" DOC - Help message by :Myhelp
 " DOC
