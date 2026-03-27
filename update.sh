@@ -1,6 +1,6 @@
 #!/usr/bin/bash
 
-set -x
+#set -x
 
 # Script to update repository and install
 # The script can be run more frequently than the desired frequency
@@ -52,9 +52,13 @@ if [ $(($(date +%s) - $(date -r ~/.personalconf_last_update +%s))) -ge $delay ];
   do_install=$(check_update)
   cd sub
   for sub in *; do
-    result=$(check_update)
-    if [ $result = true ]; then
-      do_install=true
+    if [ -d $sub ]; then
+      cd $sub
+      result=$(check_update)
+      if [ $result = true ]; then
+        do_install=true
+      fi
+      cd ..
     fi
   done
   if [ $do_install = true ]; then
