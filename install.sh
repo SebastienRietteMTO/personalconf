@@ -22,12 +22,19 @@ while [ -n "$1" ]; do
   esac
   shift
 done
+if which pandoc > /dev/null 2>&1; then
+  do_doc=true
+else
+  do_doc=false
+fi
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 SUB=$ROOT/sub
-WEB=$ROOT/web
 [ ! -d $SUB ] && mkdir $SUB
-[ ! -d $WEB ] && mkdir $WEB
+if [ $do_doc == true ]; then
+  WEB=$ROOT/web
+  [ ! -d $WEB ] && mkdir $WEB
+fi
 
 function clone_or_pull {
   repository=$1
@@ -69,16 +76,18 @@ function log {
 #######################
 ### Main doc
 #######################
-cat - <<EOF > $WEB/index.html
-<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <title>Personal conf documentation</title>
-  </head>
-  <body>
-    <p>Different documentations are available here:</p>
-    <ul>
-EOF
+if [ $do_doc == true ]; then
+  cat - <<..EOF > $WEB/index.html
+  <!DOCTYPE html>
+  <html lang="en">
+    <head>
+      <title>Personal conf documentation</title>
+    </head>
+    <body>
+      <p>Different documentations are available here:</p>
+      <ul>
+..EOF
+fi
 
 #######################
 ### Crontab entries
@@ -111,9 +120,11 @@ VIMFILE=$(clone_or_pull $repository_vimrc vim)/.vimrc
 
 # Doc generation
 log "  doc generation"
-grep '^" DOC' $VIMFILE | cut -c 7- | pandoc -f markdown -o $WEB/vimrc.html
-cp $VIMFILE $WEB/vimrc
-echo "      <li>VIM: <a href='vimrc.html'>doc</a> and associated <a href='vimrc'>conf</a></li>" >> $WEB/index.html
+if [ $do_doc == true ]; then
+  grep '^" DOC' $VIMFILE | cut -c 7- | pandoc -f markdown -o $WEB/vimrc.html
+  cp $VIMFILE $WEB/vimrc
+  echo "      <li>VIM: <a href='vimrc.html'>doc</a> and associated <a href='vimrc'>conf</a></li>" >> $WEB/index.html
+fi
 
 # Installation
 if [ $doc_only == false ]; then
@@ -139,9 +150,11 @@ repository_git=https://gist.github.com/SebastienRietteMTO/ab736e0b99179e4eb48cd7
 GITFILE=$(clone_or_pull $repository_git git)/.gitconfig
 
 # Doc generation
-grep '^# DOC' $GITFILE | cut -c 7- | sed 's/\[/`/g' | sed 's/\]/`/g' | pandoc -f markdown -o $WEB/git.html
-cp $GITFILE $WEB/gitconfig
-echo "      <li>GIT: <a href='git.html'>doc</a> and associated <a href='gitconfig'>conf</a></li>" >> $WEB/index.html
+if [ $do_doc == true ]; then
+  grep '^# DOC' $GITFILE | cut -c 7- | sed 's/\[/`/g' | sed 's/\]/`/g' | pandoc -f markdown -o $WEB/git.html
+  cp $GITFILE $WEB/gitconfig
+  echo "      <li>GIT: <a href='git.html'>doc</a> and associated <a href='gitconfig'>conf</a></li>" >> $WEB/index.html
+fi
 
 # Installation
 if [ $doc_only == false ]; then
@@ -153,9 +166,11 @@ fi
 #######################
 ### END
 #######################
-cat - <<EOF >> $WEB/index.html
-    </ul>
-  </body>
-</html>
-EOF
+if [ $do_doc == true ]; then
+  cat - <<..EOF >> $WEB/index.html
+      </ul>
+    </body>
+  </html>
+..EOF
+fi
 log "END"
