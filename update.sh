@@ -62,6 +62,7 @@ if [ $(($(date +%s) - $(date -r ~/.personalconf_last_update +%s))) -ge $delay ];
       cd ..
     fi
   done
+  cd ..
   if [ $do_install = true ]; then
     output="${output} $(./install.sh)"
     if [ $? -ne 0 ]; then
