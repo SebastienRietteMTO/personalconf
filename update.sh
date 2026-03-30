@@ -1,6 +1,7 @@
 #!/usr/bin/bash
 
 #set -x
+set -e
 
 # Script to update repository and install
 # The script can be run more frequently than the desired frequency
