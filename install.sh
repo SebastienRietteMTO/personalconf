@@ -58,14 +58,16 @@ function clone_or_pull {
 
 function mvold {
   filename=$1
-  basedest=${filename}.save$(date '+%Y%m%d')
-  dest=$basedest
-  i=0
-  while [ -f $dest ]; do
-    i=$(($i+1))
-    dest=${basedest}.$i
-  done
-  mv $filename $dest
+  if [ -e $filename ]; then
+    basedest=${filename}.save$(date '+%Y%m%d')
+    dest=$basedest
+    i=0
+    while [ -f $dest ]; do
+      i=$(($i+1))
+      dest=${basedest}.$i
+    done
+    mv $filename $dest
+  fi
 }
 
 VERBOSE=true
