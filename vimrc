@@ -175,8 +175,10 @@ Plug 'airblade/vim-gitgutter' " Add a sign for added/deleted lines
 " DOC - Completion with tab
 " DOC - help with \<Ctrl-Space\>
 " DOC
-Plug 'ervandew/supertab' " Completion with tab
-Plug 'davidhalter/jedi-vim' " Ctrl-space to get help on python functions
+if has('python3')
+  Plug 'ervandew/supertab' " Completion with tab
+  Plug 'davidhalter/jedi-vim' " Ctrl-space to get help on python functions
+endif
 
 """"" Tags
 " DOC
@@ -239,8 +241,7 @@ Plug 'junegunn/fzf.vim'
 " DOC :AIChat (ou Ctrl-h) to open a chat window, retype :AIChat each time you want an answer
 " DOC several models are available and are selected with /{model}
 " DOC The albert API key must be stored in ~/.albert.token
-Plug 'madox2/vim-ai'
-let g:vim_ai_roles_config_file = '~/.vimairoles.ini'
+"
 " EXEC cat - <<EOF > ~/.vimairoles.ini
 " EXEC [default]
 " EXEC options.endpoint_url = https://albert.api.etalab.gouv.fr/v1/chat/completions
@@ -264,9 +265,13 @@ let g:vim_ai_roles_config_file = '~/.vimairoles.ini'
 " EXEC options.model = Qwen/Qwen3-Coder-30B-A3B-Instruct
 " EXEC EOF
 
-nnoremap <C-h> :AIChat<CR>
-xnoremap <C-h> :AIChat<CR>
-cabbrev E AIEdit
+if has('python3')
+  Plug 'madox2/vim-ai'
+  let g:vim_ai_roles_config_file = '~/.vimairoles.ini'
+  nnoremap <C-h> :AIChat<CR>
+  xnoremap <C-h> :AIChat<CR>
+  cabbrev E AIEdit
+endif
 
 call plug#end()
 
