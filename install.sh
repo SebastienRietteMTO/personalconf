@@ -143,6 +143,45 @@ if [ $doc_only == false ]; then
   fi
 fi
 
+##################
+### .bashrc_common
+##################
+log ".bashrc_common"
+
+# Gist repository
+log "  cloning"
+repository_bashrc=https://gist.github.com/SebastienRietteMTO/13cf9ac66b95eaca4f66dfdb4b5b0b8f
+BASHRCFILE=$(clone_or_pull $repository_bashrc bash)/.bashrc_common
+
+# Doc generation
+log "  doc generation"
+if [ $do_doc == true ]; then
+  echo -e "$(grep '^# DOC ' /home/riette/GIT/personalconf/sub/bash/.bashrc_common | cut -c 7-)" | sed -r "s/\x1B\[([0-9]{1,2}(;[0-9]{1,2})?)?[m|K]//g" | pandoc -f markdown -o $WEB/bashrc.html
+  cp $BASHRCFILE $WEB/bashrc
+  echo "      <li>BASH: <a href='bashrc.html'>doc</a> and associated <a href='bashrc'>conf</a></li>" >> $WEB/index.html
+fi
+
+# Installation
+if [ $doc_only == false ]; then
+  log "  installation"
+
+  # Install file
+  destfile=~/.bashrc_common
+  if [ ! $destfile -ef $BASHRCFILE ]; then
+    mvold $destfile
+    ln -s $BASHRCFILE $destfile
+  fi
+
+  # Use file
+  if ! grep "source $destfile" ~/.bashrc; then
+    cat - <<....EOF >> ~/.bashrc
+
+# Source the .bashrc_common file
+source $destfile
+....EOF
+  fi
+fi
+
 #######################
 ### git
 #######################
