@@ -59,7 +59,7 @@
 # DOC - [git fetch --tags] # to get tags
 # DOC - [git lasttag] # to find the last tag
 # DOC - [git tag -d <TAG>] # suppress a local tag
-# DOC - [git push --delete <remote>upstream <TAG>] # suppress a remote tag
+# DOC - [git push --delete <remote> <TAG>] # suppress a remote tag
 # DOC
 # DOC MERGE
 # DOC =====
@@ -94,6 +94,10 @@
 # DOC
 # DOC - [git fetch <remote> pull/<ID>/head:<branch>] # create a local branch with the pull request content
 # DOC - [git pull <remote> pull/<ID>/head] # merge the pull request in the current branch
+# DOC
+# DOC HISTORY
+# DOC =======
+# DOC - [git sizes] # list all files in the history sorted by sizes
 
 [diff]
 	tool = vimdiff
@@ -105,5 +109,6 @@
 	log1 = log -n1
 	Myhelp = "!echo -e \"$(grep '^# DOC' $(git config --list --show-origin | grep alias.Myhelp | cut -d: -f2 | cut -f1) | cut -c 7- | sed 's/\\[/`\\\\033[2m/g' | sed 's/\\]/\\\\033[0m`/g')\" | more" # display the included doc
 	lasttag = "!git describe --tags `git rev-list --tags --max-count=1`" # get the last tag set on the current branch
+  sizes = "!git rev-list --objects --all | git cat-file --batch-check='%(objecttype) %(objectname) %(objectsize) %(rest)' | sed -n 's/^blob //p' | sort --numeric-sort --key=2 | cut -c 1-12,41- | $(command -v gnumfmt || echo numfmt) --field=2 --to=iec-i --suffix=B --padding=7 --round=nearest" # list files in history sorted by size https://www.pixelite.co.nz/article/finding-and-deleting-large-files-in-a-git-repo/
 [merge]
 	tool = vimdiff
